@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Aux from '../../hoc/Aux';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
+import Modal from '../../components/UI/Modal/Modal';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 
 const INGREDIENTS_PRICE = {
     salad: 0.5,
@@ -19,7 +21,20 @@ class BurgerBuilder extends Component {
             cheese: 0,
             bacon: 0
         },
-        totalPrice: 5
+        totalPrice: 5,
+        purchasable: false,
+        purchasing: false
+    }
+
+    updatePurchasableState(ingridients) {
+        const sum = Object.keys(ingridients)
+            .map(igKey => {
+                return ingridients[igKey];
+            })
+            .reduce((sum, element) => {
+                return sum + element;
+            }, 0)
+        this.setState({ purchasable: sum > 0 })
     }
 
     addIngridientsHandler = (type) => {
@@ -33,6 +48,7 @@ class BurgerBuilder extends Component {
         const oldPrice = this.state.totalPrice;
         const newPrice = oldPrice + priceAddition;
         this.setState({totalPrice: newPrice, ingridients: updatedIngridients});
+        this.updatePurchasableState(updatedIngridients);
     }
 
     removeIngridientsHandler = (type) => {
@@ -47,16 +63,35 @@ class BurgerBuilder extends Component {
         const oldPrice = this.state.totalPrice;
         const newPrice = oldPrice - priceDeduction;
         this.setState({totalPrice: newPrice, ingridients: updatedIngridients});
+        this.updatePurchasableState(updatedIngridients);
+    }
+
+    purchasingHandler = () => {
+        this.setState({purchasing: true});
     }
 
     render() {
+        const disabledInfo = {
+            ...this.state.ingridients
+        }
+
+        for (let key in disabledInfo) {
+            disabledInfo[key] = disabledInfo[key] <= 0;
+        }
+
         return (
             <Aux>
+                <Modal show={this.state.purchasing}>
+                    <OrderSummary ingridients={this.state.ingridients}/>
+                </Modal>
                 <Burger ingridients={this.state.ingridients} />
-                <p>Total Price: {this.state.totalPrice.toFixed(2)}</p>
                 <BuildControls
                     ingridientAdded ={this.addIngridientsHandler}
                     ingridientRemoved={this.removeIngridientsHandler}
+                    disabled={disabledInfo}
+                    purchasable={this.state.purchasable}
+                    ordered={this.purchasingHandler}
+                    totalPrice={this.state.totalPrice}
                 />
             </Aux>
         )
