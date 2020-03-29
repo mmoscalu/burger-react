@@ -1,5 +1,5 @@
 import React from 'react';
-import Layot from './components/Layot/Layot';
+import Layot from './hoc/Layot/Layot';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
 
 function App() {
