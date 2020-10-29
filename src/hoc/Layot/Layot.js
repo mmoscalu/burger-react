@@ -3,6 +3,7 @@ import Aux from '../Aux/Aux';
 import classes from './Layot.css';
 import Toolbar from '../../components/Navigation/Toolbar/Toolbar';
 import SideDrawer from '../../components/Navigation/SideDrawer/SideDrawer';
+import { withRouter } from 'react-router-dom';
 
 class Layot extends Component {
 
@@ -20,10 +21,14 @@ class Layot extends Component {
         });
     }
 
+    onLogoClickHandler = () => {
+        this.props.history.replace('/')
+    }
+
     render() {
         return (
             <Aux>
-                <Toolbar drawerToggleClicked={ this.drawerToggleClickedHandler }/>
+                <Toolbar clicked={this.onLogoClickHandler} drawerToggleClicked={ this.drawerToggleClickedHandler }/>
                 <SideDrawer
                     open={ this.state.showSideDrawer }
                     closed={ this.sideDrawerClosedHandler }/>
@@ -35,4 +40,4 @@ class Layot extends Component {
     }
 }
 
-export default Layot;
+export default withRouter(Layot);
