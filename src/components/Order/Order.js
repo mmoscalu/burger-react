@@ -12,7 +12,7 @@ const order = (props) => {
 
   const ingridientOutput = ingridients.map((ig) => {
     return (
-      <span>
+      <span key={ig.name} className={classes.ingridientOutput}>
         {ig.name} ({ig.amount})
       </span>
     );
