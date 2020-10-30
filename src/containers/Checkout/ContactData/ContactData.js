@@ -21,9 +21,13 @@ class ContactData extends Component {
             { value: 'chipest', displayValue: 'Chipest' },
           ],
         },
+        value: 'fastest',
+        validation: {},
+        valid: true,
       },
     },
     loading: false,
+    formIsValid: false,
   };
 
   createFormControl(name, type, placeholder) {
@@ -34,16 +38,61 @@ class ContactData extends Component {
         placeholder: placeholder,
       },
       value: '',
+      validation: {
+        required: true,
+        minLength: name === 'postalCode' ? 5 : null,
+        maxLength: name === 'postalCode' ? 5 : null,
+      },
+      valid: false,
+      touched: false,
     };
     return formControl;
   }
 
+  checkFormValidity(value, rules) {
+    let isValid = true;
+
+    if (rules.required) {
+      isValid = value.trim() !== '' && isValid;
+    }
+    if (rules.minLength) {
+      isValid = value.length >= rules.minLength && isValid;
+    }
+    if (rules.maxLength) {
+      isValid = value.length <= rules.maxLength && isValid;
+    }
+
+    return isValid;
+  }
+
+  onFormControlChangeHandler = (value, formContolId) => {
+    const updatedForm = { ...this.state.orderForm };
+    const updatedFormElement = { ...updatedForm[formContolId] };
+    updatedFormElement.value = value;
+    updatedFormElement.valid = this.checkFormValidity(
+      updatedFormElement.value,
+      updatedFormElement.validation
+    );
+    updatedFormElement.touched = true;
+    updatedForm[formContolId] = updatedFormElement;
+    let formIsValid = true;
+    for (let control in updatedForm) {
+      formIsValid = updatedForm[control].valid && formIsValid;
+    }
+    this.setState({ orderForm: updatedForm, formIsValid: formIsValid });
+  };
+
   onSubmitHandler = (event) => {
     event.preventDefault();
     this.setState({ loading: true });
+    const formData = {};
+    for (let formControlName in this.state.orderForm) {
+      formData[formControlName] = this.state.orderForm[formControlName].value;
+    }
     const order = {
       ingridients: this.props.ingridients,
       price: this.props.price,
+      orderData: formData,
     };
     axios
       .post('/orders.json', order)
@@ -66,14 +115,25 @@ class ContactData extends Component {
       });
     }
     let form = (
-      <form>
+      <form onSubmit={this.onSubmitHandler}>
         {formArrayData.map((formControl) => (
-          <Input key={formControl.id}
-          elementType={formControl.config.elementType}
-          elementConfig={formControl.config.elementConfig}
-          value={formControl.config.value} />
+          <Input
+            key={formControl.id}
+            elementType={formControl.config.elementType}
+            elementConfig={formControl.config.elementConfig}
+            value={formControl.config.value}
+            changed={(event) =>
+              this.onFormControlChangeHandler(
+                event.target.value,
+                formControl.id
+              )
+            }
+            touched={formControl.config.touched}
+            shouldValidate={formControl.config.validation}
+            invalid={!formControl.config.valid}
+          />
         ))}
-        <Button btnType='Success' clicked={this.onSubmitHandler}>
+        <Button btnType='Success' disabled={!this.state.formIsValid}>
           Order
         </Button>
       </form>

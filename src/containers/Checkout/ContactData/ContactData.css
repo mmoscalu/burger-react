@@ -3,8 +3,7 @@
     text-align: center;
     width: 80%;
     box-sizing: border-box;
-    box-shadow: 0 7px 7px rgba(0,0,0, 0.2);
-    /* padding: 10px; */
+    box-shadow: 0 3px 7px rgba(0,0,0, 0.3);
 }
 
 .ContactData form {

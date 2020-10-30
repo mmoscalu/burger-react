@@ -1,5 +1,5 @@
 .Input {
-    padding: 10px;
+    padding: 0 10px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -9,9 +9,29 @@
     background: white;
     width: 100%;
     box-sizing: border-box;
+    height: 30px;
+    padding: 0 5px;
 }
 
-.InputElement:focus {
+.InputElement:not(.Invalid):focus {
     outline: none;
     background: #ccc;
+}
+
+.Invalid {
+    border: 1px solid red;
+    background: salmon;
+}
+
+.InvalidMessage {
+    color: red;
+    font-size: 10px;
+    line-height: 20px;
+    height: 20px;
+    margin: 0;
+    text-align: left;
+}
+
+.Invalid::placeholder {
+    color: white;
 }
